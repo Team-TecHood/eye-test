@@ -83,6 +83,50 @@
 
         .plate-container {
             margin-bottom: 0;
+            position: relative;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(42, 42, 42, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 16px;
+            z-index: 10;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #444;
+            border-top: 3px solid #0072B2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        .loading-text {
+            color: #ccc;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .plate-image {
@@ -377,6 +421,10 @@
                 <div class="plate-section">
                     <div class="plate-container">
                         <img id="plateImage" class="plate-image" src="" alt="Color vision test plate">
+                        <div id="loadingOverlay" class="loading-overlay">
+                            <div class="loading-spinner"></div>
+                            <div class="loading-text">Loading plate...</div>
+                        </div>
                     </div>
                 </div>
                 
@@ -477,12 +525,24 @@
             const plateImage = document.getElementById('plateImage');
             const plateCounter = document.getElementById('plateCounter');
             const progressFill = document.getElementById('progressFill');
+            const loadingOverlay = document.getElementById('loadingOverlay');
             
-            plateImage.src = `plates/Screening Plates/${plateNumber}.png`;
+            // Show loading overlay
+            loadingOverlay.classList.remove('hidden');
+            
+            plateImage.onload = function() {
+                // Hide loading overlay when image is loaded
+                loadingOverlay.classList.add('hidden');
+            };
+            
             plateImage.onerror = function() {
                 console.error('Failed to load screening image:', plateImage.src);
                 plateImage.alt = 'Screening image failed to load';
+                // Hide loading overlay even on error
+                loadingOverlay.classList.add('hidden');
             };
+            
+            plateImage.src = `plates/Screening Plates/${plateNumber}.png`;
             
             plateCounter.textContent = `Screening - Plate ${3 - screeningConfig.currentPlates.length} of 2`;
             progressFill.style.width = `${((2 - screeningConfig.currentPlates.length) / 2) * 100}%`;
@@ -539,12 +599,24 @@
             const plateImage = document.getElementById('plateImage');
             const plateCounter = document.getElementById('plateCounter');
             const progressFill = document.getElementById('progressFill');
+            const loadingOverlay = document.getElementById('loadingOverlay');
             
-            plateImage.src = plate.path;
+            // Show loading overlay
+            loadingOverlay.classList.remove('hidden');
+            
+            plateImage.onload = function() {
+                // Hide loading overlay when image is loaded
+                loadingOverlay.classList.add('hidden');
+            };
+            
             plateImage.onerror = function() {
                 console.error('Failed to load image:', plate.path);
                 plateImage.alt = 'Image failed to load';
+                // Hide loading overlay even on error
+                loadingOverlay.classList.add('hidden');
             };
+            
+            plateImage.src = plate.path;
             
             const currentType = testConfig.types[currentTest.currentTypeIndex];
             const currentAxis = currentTest.axisResults[currentType];
