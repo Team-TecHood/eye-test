@@ -6,6 +6,32 @@
     <meta name="description" content="Professional color vision test using adaptive staircase algorithm. Assess Deuteranomaly, Protanomaly, and Tritanomaly with clinically accurate Ishihara-style plates.">
     <title>VisuAll Eye Test - Digital Color Vision Assessment</title>
     <style>
+        :root {
+            --bg-primary: #000000;
+            --bg-card: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #888888;
+            --border-color: #444444;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --loading-bg: rgba(42, 42, 42, 0.95);
+            --button-bg: #333333;
+            --button-hover: #444444;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f5f5f5;
+            --bg-card: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #555555;
+            --text-muted: #777777;
+            --border-color: #dddddd;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --loading-bg: rgba(255, 255, 255, 0.95);
+            --button-bg: #f0f0f0;
+            --button-hover: #e0e0e0;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,8 +40,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: #000000;
-            color: #ffffff;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -24,6 +50,7 @@
             padding: 10px;
             margin: 0;
             overflow: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .container {
@@ -38,6 +65,26 @@
         .header {
             margin: 30px 0 20px 0;
             flex-shrink: 0;
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 20px;
+            background: var(--button-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--button-hover);
+            transform: translateY(-1px);
         }
 
         .title {
@@ -53,9 +100,10 @@
         }
 
         .test-area {
-            background-color: #2a2a2a;
+            background-color: var(--bg-card);
             border-radius: 16px;
             padding: 20px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
             margin: 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             display: flex;
@@ -79,6 +127,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+
+        .progress-info {
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
         }
 
         .plate-container {
@@ -137,28 +192,8 @@
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
 
-        .progress-info {
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-            color: #888;
-            align-self: stretch;
-        }
 
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background-color: #333;
-            border-radius: 2px;
-            margin-bottom: 15px;
-            overflow: hidden;
-            align-self: stretch;
-        }
 
-        .progress-fill {
-            height: 100%;
-            background-color: #0072B2;
-            transition: width 0.3s ease;
-        }
 
         .input-section {
             margin-top: 0;
@@ -173,9 +208,9 @@
         }
 
         .number-btn {
-            background-color: #333;
-            border: 2px solid #444;
-            color: #fff;
+            background-color: var(--button-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
             padding: 16px 32px;
             font-size: 1.1rem;
             font-weight: normal;
@@ -200,9 +235,9 @@
         }
 
         .nothing-btn {
-            background-color: #333;
-            border: 2px solid #444;
-            color: #fff;
+            background-color: var(--button-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
             padding: 16px 48px;
             font-size: 1.1rem;
             font-weight: normal;
@@ -231,11 +266,12 @@
 
         .results-container {
             display: none;
-            background-color: #2a2a2a;
+            background-color: var(--bg-card);
             border-radius: 16px;
+            transition: background-color 0.3s ease;
             padding: 40px;
             margin: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px var(--shadow-color);
         }
 
         .results-title {
@@ -249,10 +285,12 @@
             font-size: 1.1rem;
             margin-bottom: 20px;
             padding: 15px;
-            background-color: #333;
+            color: var(--text-primary);
+            background-color: var(--button-bg);
             border-radius: 8px;
             border-left: 4px solid #0072B2;
             font-weight: 500;
+            transition: background-color 0.3s ease;
         }
 
         .scores {
@@ -263,15 +301,16 @@
         }
 
         .score-item {
-            background-color: #333;
+            background-color: var(--button-bg);
             padding: 15px;
             border-radius: 8px;
+            transition: background-color 0.3s ease;
             text-align: center;
         }
 
         .score-label {
             font-size: 0.9rem;
-            color: #888;
+            color: var(--text-muted);
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -297,8 +336,9 @@
 
 
         .restart-btn:hover {
-            background-color: #333;
-            border-color: #444;
+            background-color: var(--button-bg);
+            border-color: var(--border-color);
+            color: var(--text-primary);
         }
 
         .restart-btn:focus {
@@ -312,7 +352,7 @@
         .start-description {
             font-size: 1.1rem;
             line-height: 1.6;
-            color: #ccc;
+            color: var(--text-secondary);
             margin-bottom: 40px;
             max-width: 600px;
             text-align: justify;
@@ -332,8 +372,9 @@
 
 
         .start-btn:hover {
-            background-color: #333;
-            border-color: #444;
+            background-color: var(--button-bg);
+            border-color: var(--border-color);
+            color: var(--text-primary);
         }
 
         .start-btn:focus {
@@ -358,6 +399,10 @@
                 margin: 15px;
             }
             
+            .theme-toggle {
+                right: 15px;
+            }
+
             .results-container {
                 margin: 15px;
             }
@@ -379,23 +424,22 @@
                 font-size: 1rem;
             }
             
+            .progress-info {
+                margin-bottom: 15px;
+                font-size: 0.85rem;
+            }
+
             .plate-image {
                 max-width: 280px;
             }
             
-            .progress-info {
-                margin-bottom: 8px;
-            }
-            
-            .progress-bar {
-                margin-bottom: 10px;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
             <h1 class="title">VisuAll Eye Test</h1>
             <p class="subtitle">Digital Color Vision Assessment</p>
         </div>
@@ -417,9 +461,6 @@
         <div id="testScreen" class="test-area" style="display: none;">
             <div class="progress-info">
                 <span id="plateCounter">Plate 1 of 18</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
             </div>
             
             <div class="test-content">
@@ -481,6 +522,35 @@
     </div>
 
     <script>
+        // Theme management
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (body.getAttribute('data-theme') === 'light') {
+                body.removeAttribute('data-theme');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.setAttribute('data-theme', 'light');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Load saved theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (savedTheme === 'light') {
+                document.body.setAttribute('data-theme', 'light');
+                themeToggle.textContent = '☀️';
+            } else {
+                themeToggle.textContent = '🌙';
+            }
+        });
+
         // Test configuration and state
         const testConfig = {
             shades: [87, 75, 62, 50, 37, 25], // High to low contrast (easiest to hardest) for adaptive testing
@@ -529,7 +599,6 @@
             
             const plateImage = document.getElementById('plateImage');
             const plateCounter = document.getElementById('plateCounter');
-            const progressFill = document.getElementById('progressFill');
             const loadingOverlay = document.getElementById('loadingOverlay');
             
             // Show loading overlay
@@ -550,7 +619,6 @@
             plateImage.src = `plates/Screening Plates/${plateNumber}.png`;
             
             plateCounter.textContent = `Screening - Plate ${3 - screeningConfig.currentPlates.length} of 2`;
-            progressFill.style.width = `${((2 - screeningConfig.currentPlates.length) / 2) * 100}%`;
             
             // Reset selection
             clearSelection();
@@ -603,7 +671,6 @@
             
             const plateImage = document.getElementById('plateImage');
             const plateCounter = document.getElementById('plateCounter');
-            const progressFill = document.getElementById('progressFill');
             const loadingOverlay = document.getElementById('loadingOverlay');
             
             // Show loading overlay
@@ -627,10 +694,6 @@
             const currentAxis = currentTest.axisResults[currentType];
             plateCounter.textContent = `${currentType} Cones - Contrast Level ${testConfig.shades[currentAxis.currentShadeIndex]}`;
             
-            // Calculate progress based on completed cone tests
-            const completedCount = Object.values(currentTest.axisResults).filter(r => r.completed).length;
-            const progress = (completedCount / 3) * 100;
-            progressFill.style.width = `${progress}%`;
             
             // Reset selection
             clearSelection();
